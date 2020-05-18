@@ -8,7 +8,7 @@ const app = express();
 
 mongoose.connect("mongodb+srv://sean:IWuVHUqrsPDNysYD@cluster0-tehq7.mongodb.net/node-angular?retryWrites=true&w=majority")
   .then(() => {
-    console.log('Connected tp database!')
+    console.log('Connected to database!')
   })
   .catch(() => {
     console.log('Connection failed!')
@@ -38,10 +38,12 @@ app.post("/api/posts", (req, res, next) => {
     title: req.body.title,
     content: req.body.content
   });
-  post.save();
-  res.status(201).json({
-    message: "post added successfully!"
-  })
+  post.save().then(result => {
+    console.log(result);
+    res.status(201).json({
+      message: "post added successfully!"
+    })
+  });
 });
 
 app.get('/api/posts', (req, res, next) => {
@@ -52,5 +54,12 @@ app.get('/api/posts', (req, res, next) => {
     });
   });
 });
+
+app.delete("/api/posts/:id", (req, res, next) => {
+  Post.deleteOne({_id: req.params.id}).then(result => {
+    console.log(result);
+  })
+  res.status(200).json({ message: "Post Deleted!"});
+})
 
 module.exports = app;
