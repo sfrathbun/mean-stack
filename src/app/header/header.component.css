@@ -1,5 +1,5 @@
 ul {
-  list-style: decimal-leading-zero;
+  list-style: none;
   padding: 0;
   margin: 0;
 }
@@ -9,7 +9,10 @@ a {
   color: white;
 }
 
+ul {
+  display: flex;
+}
+
 .spacer {
   flex: 1 1 auto;
 }
-
