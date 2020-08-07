@@ -3,6 +3,8 @@ import { Subscription } from 'rxjs'
 
 import { Post } from '../post.model';
 import { PostsService } from '../posts.service';
+// this PageEvent is an object used to hold data about the page
+import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-post-list',
@@ -18,19 +20,29 @@ export class PostListComponent implements OnInit, OnDestroy {
   //   { title: 'Fourth Post', content: 'This is the fourth post\'s content'}
   // ]
   posts: Post[] = [];
-  private postsSub: Subscription;
   isLoading = false;
+  totalPosts = 10;
+  postsPerPage = 2;
+  currentPage = 1;
+  pageSizeOptions = [1, 2, 5, 10];
+  private postsSub: Subscription;
 
   constructor(public postsService: PostsService) {}
 
   ngOnInit() {
     this.isLoading = true;
-    this.postsService.getPosts();
+    this.postsService.getPosts(this.postsPerPage, this.currentPage);
     this.postsSub = this.postsService.getPostUpdateListener()
       .subscribe((posts: Post[]) => {
         this.isLoading = false;
       this.posts = posts;
     });
+  }
+
+  onChangedPage(pageData: PageEvent) {
+    this.currentPage = pageData.pageIndex + 1;
+    this.postsPerPage = pageData.pageSize;
+    this.postsService.getPosts(this.postsPerPage, this.currentPage);
   }
 
   onDelete(postId: string) {
