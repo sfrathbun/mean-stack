@@ -36,18 +36,18 @@ router.post("", multer({ storage: storage }).single("image"), (req, res, next) =
     content: req.body.content,
     imagePath: url + "/images/" + req.file.filename
   });
-  post.save().then(result => {
-    console.log(result);
+  post.save().then(createdPost => {
+    console.log(createdPost);
     res.status(201).json({
       message: "post added successfully!",
       post: {
         // instead you can use the spread operator like below and override some properties such as the id
-        // ...createdPost,
-        // id: createdPost._id
-        id: createdPost._id,
-        title: createdPost.title,
-        content: createdPost.content,
-        imagePath: createdPost.imagePath
+        ...createdPost,
+        id: createdPost._id
+        // id: createdPost._id,
+        // title: createdPost.title,
+        // content: createdPost.content,
+        // imagePath: createdPost.imagePath
       }
     });
   });
@@ -73,8 +73,16 @@ multer({ storage: storage }).single("image"),
   });
 });
 
-router.get('', (req, res, next) => {
-  Post.find().then(documents => {
+router.get("", (req, res, next) => {
+  const pageSize = +req.query.pagesize;
+  const currentPage = +req.query.page;
+  const postQuery = Post.find();
+  if (pageSize && currentPage) {
+    postQuery
+      .skip(pageSize * (currentPage - 1))
+      .limit(pageSize);
+  }
+  postQuery.then(documents => {
     res.status(200).json({
       message: 'posts fetched successfully!',
       posts: documents
